@@ -1,2 +1,7 @@
 ---
 # vars file for nexus
+
+user_name: nexus
+group_name: nexus
+nexus_pkg_dir: /tmp
+nexus_working_dir: /opt

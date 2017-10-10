@@ -2,39 +2,39 @@
 
 # tasks file for nexus
 
-- name: Download nexus
-  get_url:
-    url: https://sonatype-download.global.ssl.fastly.net/nexus/3/nexus-3.0.2-02-unix.tar.gz 
-    dest: /opt/
+#- name: Download nexus
+#  get_url:
+#    url: https://sonatype-download.global.ssl.fastly.net/nexus/3/nexus-3.0.2-02-unix.tar.gz 
+#    dest: "{{ nexus_pkg_dir }}"
 
 - name: Ensure Nexus o/s group exists
-  group: name=nexus state=present
+  group: name={{ user_name }} state=present
   sudo: true
 
 - name: Ensure Nexus o/s user exists
-  user: name=nexus group=nexus  state=present 
+  user: name=nexus group={{ group_name }}  state=present 
   sudo: true
 
 
 - name: Extract gz file
   unarchive:
     remote_src: yes
-    src: /opt/nexus-3.0.2-02-unix.tar.gz
-    dest: /opt/
+    src: "{{ nexus_pkg_dir }}/nexus-3.0.2-02-unix.tar.gz"
+    dest: "{{ nexus_pkg_dir }}"
 
 - name: move nexus directory
-  command: mv /opt/nexus-3.0.2-02  /opt/nexus
+  command: mv "{{ nexus_pkg_dir }}"/nexus-3.0.2-02  "{{ nexus_working_dir }}"/nexus
 
 
 - name: Adding configuration file ...
-  template: src=nexus.rc.j2 dest=/opt/nexus/bin/nexus.rc 
+  template: src=nexus.rc.j2 dest={{ nexus_working_dir }}/nexus/bin/nexus.rc 
 
 - name: Adding configuration file ...
-  template: src=nexus.vmoptions.j2 dest=/opt/nexus/bin/nexus.vmoptions
+  template: src=nexus.vmoptions.j2 dest={{ nexus_working_dir }}/nexus/bin/nexus.vmoptions
 
 - name: Set permissions and ownership on Nexus installation directory
   file:
-    path=/opt/nexus
+    path={{ nexus_working_dir }}/nexus
     state="directory"
     owner=nexus
     group=nexus
@@ -43,7 +43,7 @@
 
 - name: setup link of javac to /etc/alternatives
   file: 
-    src: /opt/nexus/bin/nexus  
+    src: "{{ nexus_working_dir }}/nexus/bin/nexus"  
     dest: /etc/init.d/nexus
     state: link
 
