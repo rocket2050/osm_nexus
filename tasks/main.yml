@@ -41,7 +41,7 @@
     mode="0755"
     recurse=true
 
-- name: setup link of javac to /etc/alternatives
+- name: setup link of nexus service
   file: 
     src: "{{ nexus_working_dir }}/nexus/bin/nexus"  
     dest: /etc/init.d/nexus
