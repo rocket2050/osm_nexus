@@ -1,0 +1,5 @@
+---
+
+- hosts: nexus
+  roles:
+    - role: osm_nexus

@@ -1,0 +1,52 @@
+---
+
+# tasks file for nexus
+
+- name: Download nexus
+  get_url:
+    url: https://sonatype-download.global.ssl.fastly.net/nexus/3/nexus-3.0.2-02-unix.tar.gz 
+    dest: /opt/
+
+- name: Ensure Nexus o/s group exists
+  group: name=nexus state=present
+  sudo: true
+
+- name: Ensure Nexus o/s user exists
+  user: name=nexus group=nexus  state=present 
+  sudo: true
+
+
+- name: Extract gz file
+  unarchive:
+    remote_src: yes
+    src: /opt/nexus-3.0.2-02-unix.tar.gz
+    dest: /opt/
+
+- name: move nexus directory
+  command: mv /opt/nexus-3.0.2-02  /opt/nexus
+
+
+- name: Adding configuration file ...
+  template: src=nexus.rc.j2 dest=/opt/nexus/bin/nexus.rc 
+
+- name: Adding configuration file ...
+  template: src=nexus.vmoptions.j2 dest=/opt/nexus/bin/nexus.vmoptions
+
+- name: Set permissions and ownership on Nexus installation directory
+  file:
+    path=/opt/nexus
+    state="directory"
+    owner=nexus
+    group=nexus
+    mode="0755"
+    recurse=true
+
+- name: setup link of javac to /etc/alternatives
+  file: 
+    src: /opt/nexus/bin/nexus  
+    dest: /etc/init.d/nexus
+    state: link
+
+
+- name: Start nexus...
+  service: name=nexus state=started
